@@ -15,9 +15,13 @@ steps:
   inputs:
     containerregistrytype: 'Container Registry'
     dockerRegistryConnection: 'Docker-alienke'
-
-- script: echo Container scanning.
-    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy:0.47.0 image --ignore-unfixed --exit-code 0 --severity HIGH,CRITICAL $(Build.Repository.Name):$(Build.BuildId)
+    
+- task: trivy@1
+  inputs:
+    version: 'latest'
+    image: '$(Build.Repository.Name):$(Build.BuildId)'
+    severities: 'CRITICAL,HIGH'
+    ignoreUnfixed: true
   displayName: 'Container-scanning'
   continueOnError: true
 
