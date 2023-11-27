@@ -10,16 +10,23 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: Docker@0
-  displayName: 'Build an image'
-  inputs:
-    containerregistrytype: 'Container Registry'
-    dockerRegistryConnection: 'Docker-alienke'
-    
+# - task: Docker@0
+#   displayName: 'Build an image'
+#   inputs:
+#     containerregistrytype: 'Container Registry'
+#     dockerRegistryConnection: 'Docker-alienke'
+
+- script: |
+    echo  Build container
+    # docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
+    docker build -t alienke/$(Build.BuildId) .
+  displayName: 'Building image'
+  continueOnError: true
+
 - task: trivy@1
   inputs:
     version: 'latest'
-    image: '$(Build.Repository.Name):$(Build.BuildId)'
+    image: 'alienke/$(Build.BuildId)'
     severities: 'CRITICAL,HIGH'
     ignoreUnfixed: true
   displayName: 'Container-scanning'
