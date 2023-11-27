@@ -10,13 +10,16 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: Docker@2
+- task: Docker@0
   displayName: 'Build an image'
   inputs:
-    containerRegistry: 'Docker-alienke'
-    repository: 'alienke'
-    command: 'build'
-    Dockerfile: '**/Dockerfile'
+    containerregistrytype: 'Container Registry'
+    dockerRegistryConnection: 'Docker-alienke'
+
+- script: echo Container scanning.
+    - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy:0.47.0 image --ignore-unfixed --exit-code 0 --severity HIGH,CRITICAL $(Build.Repository.Name):$(Build.BuildId)
+  displayName: 'Container-scanning'
+  continueOnError: true
 
 - script: echo Running dependency-check.
     docker run --rm -v $(pwd):/src hysnsec/safety check -r requirements.txt
