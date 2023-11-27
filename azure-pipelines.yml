@@ -10,8 +10,15 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: Docker@2
+  inputs:
+    command: 'build'
+    Dockerfile: '**/Dockerfile'
+
+- script: echo Running dependency-check.
+    docker run --rm -v $(pwd):/src hysnsec/safety check -r requirements.txt
+  displayName: 'Run dependency-check'
+  
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.
@@ -19,6 +26,12 @@ steps:
   displayName: 'Run a multi-line script'
 
 - script: |
+    echo Running IaC.
+    docker run --rm -w /src -v $(pwd):/src bridgecrew/checkov -d /src
+  displayName: 'Run IaC - checkov'
+
+- script: |
     echo Running SAST.
     docker run --user $(id -u):$(id -g) -v $(pwd):/src --rm hysnsec/bandit -r /src
   displayName: 'Run SAST - Bandit'
+  
