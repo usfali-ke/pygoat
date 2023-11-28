@@ -59,9 +59,11 @@ stages:
     
     - script: |
         echo Running dependency-check-2.
-        # docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
+        npm install snyk -g
         pip3 install -r requirements.txt
-        docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker test --packages-folder=/project/requirements.txt --severity-threshold=high
+        export SNYK_TOKEN=$(SNYK_TOKEN)
+        snyk test
+        # docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker test --packages-folder=/project/requirements.txt --severity-threshold=high
       displayName: Dependency-check-2
       continueOnError: true
 
