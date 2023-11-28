@@ -70,7 +70,7 @@ stages:
     - script: |
         echo Running SAST.
         docker run --user $(id -u):$(id -g) -v $(pwd):/src --rm hysnsec/bandit -r /src
-      displayName: SAST_Bandit
+      displayName: SAST Bandit
       continueOnError: true
 
     - script: |
@@ -79,7 +79,7 @@ stages:
       displayName: SAST-SNYK
       continueOnError: true
     - task: CmdLine@2
-      displayName: Container_scanning
+      displayName: Container scanning
       inputs:
         script: |
          # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy image --severity MEDIUM,HIGH --ignore-unfixed $(imageName):$(tag)
@@ -88,11 +88,11 @@ stages:
     
     - script: echo Running dependency-check.
         docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
-      displayName: 'Dependency_check'
+      displayName: Dependency check
       continueOnError: true
     - task: Docker@2
-      displayName: Push-image
-      condition: eq(variables['task.Container_scanning.status'], 'success')
+      displayName: Push image
+      condition: eq(variables['task.Container scanning.status'], 'success')
       inputs:
         containerRegistry: 'Docker-alienke'
         repository: '$(imageName)'
