@@ -37,29 +37,18 @@ pool:
 #   displayName: 'Container-scanning'
 #   continueOnError: true
 
-
-  
 stages:
 - stage: Build
   displayName: Build, Scan and Push image
-  jobs:  
-  - job: Build
-    displayName: Build, Scan and Push
+  jobs:
+  - job: Tests
+    displayName: Static testing
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - script: |
-        export DOCKLE_HOST="unix:///var/run/docker.sock"
-      displayName: Setting up docker env
-    - task: Docker@2
-      displayName: Build an image
-      inputs:
-        containerRegistry: 'Docker-alienke'
-        repository: '$(imageName)'
-        command: 'build'
-        Dockerfile: '**/Dockerfile'
-        buildContext: '$(Build.SourcesDirectory)/'
-        tags: '$(tag)'
+    # - script: |
+    #     export DOCKLE_HOST="unix:///var/run/docker.sock"
+    #   displayName: Setting up docker env
     
     - script: |
           echo Running IaC.
@@ -78,6 +67,31 @@ stages:
         docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker code test --severity-threshold=high
       displayName: SAST-snyk
       continueOnError: true
+    
+    - script: echo Running dependency-check.
+        docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
+      displayName: Dependency-check
+      continueOnError: true
+
+  - job: Build
+    dependsOn: Tests
+    condition: succeeded()
+    displayName: Build, Scan and Push
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - script: |
+        export DOCKLE_HOST="unix:///var/run/docker.sock"
+      displayName: Setting up docker env
+    - task: Docker@2
+      displayName: Build an image
+      inputs:
+        containerRegistry: 'Docker-alienke'
+        repository: '$(imageName)'
+        command: 'build'
+        Dockerfile: '**/Dockerfile'
+        buildContext: '$(Build.SourcesDirectory)/'
+        tags: '$(tag)'
     - task: CmdLine@2
       displayName: Container-scanning
       inputs:
@@ -85,14 +99,9 @@ stages:
          # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy image --severity MEDIUM,HIGH --ignore-unfixed $(imageName):$(tag)
          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed $(imageName):$(tag)
       continueOnError: true
-    
-    - script: echo Running dependency-check.
-        docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
-      displayName: Dependency-check
-      continueOnError: true
     - task: Docker@2
       displayName: Push image
-      condition: eq(variables['task.Dependency-check.status'], 'success')
+      # condition: eq(variables['task.Dependency-check.status'], 'success')
       inputs:
         containerRegistry: 'Docker-alienke'
         repository: '$(imageName)'
