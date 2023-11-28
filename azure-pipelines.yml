@@ -63,7 +63,7 @@ stages:
   - job: Scan
     dependsOn:
     - Build
-    condition: failed()
+    condition: succeeded()
     displayName: Static scans
     pool:
       vmImage: 'ubuntu-latest'
