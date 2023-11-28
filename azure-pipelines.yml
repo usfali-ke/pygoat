@@ -41,13 +41,16 @@ pool:
   
 stages:
 - stage: Build
-  displayName: Build, Scan and Push image
+  displayName: Build image
   jobs:  
   - job: Build
-    displayName: Build, Scan and Push
+    displayName: Build
     pool:
       vmImage: 'ubuntu-latest'
     steps:
+    - script: |
+        export DOCKLE_HOST="unix:///var/run/docker.sock"
+      displayName: Setting up docker env
     - task: Docker@2
       displayName: Build an image
       inputs:
@@ -57,11 +60,11 @@ stages:
         Dockerfile: '**/Dockerfile'
         buildContext: '$(Build.SourcesDirectory)/'
         tags: '$(tag)'
-    
-    - script: |
-        export DOCKLE_HOST="unix:///var/run/docker.sock"
-      displayName: Set Up Docker env
-    
+  - job: Scan
+    displayName: Static scans
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:  
     - script: |
           echo Running IaC.
           docker run --rm -w /src -v $(pwd):/src bridgecrew/checkov -d /src
@@ -93,11 +96,20 @@ stages:
       displayName: 'Dependency-check'
       continueOnError: true
 
+  - job: Push
+    dependsOn: Scan
+    condition: succeeded()
+    displayName: Push Image
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
     - task: Docker@2
-      displayName: Push image to reg
+      displayName: Push image
+      condition: and (eq(variable[CmdLine@2.status]))
       inputs:
         containerRegistry: 'Docker-alienke'
         repository: '$(imageName)'
         command: 'push'
-        tags: '$(tag)' 
+        tags: '$(tag)'
+      
       
