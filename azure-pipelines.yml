@@ -64,7 +64,7 @@ stages:
     - script: |
           echo Running IaC.
           docker run --rm -w /src -v $(pwd):/src bridgecrew/checkov -d /src
-      displayName: IaC_checkov
+      displayName: IaC checkov
       continueOnError: true
 
     - script: |
@@ -76,7 +76,7 @@ stages:
     - script: |
         echo Running SAST.
         docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker code test --severity-threshold=high
-      displayName: SAST-SNYK
+      displayName: SAST SNYK
       continueOnError: true
     - task: CmdLine@2
       displayName: Container scanning
