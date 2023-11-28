@@ -44,7 +44,7 @@ stages:
   displayName: Build image
   jobs:  
   - job: Build
-    displayName: Build, Scan and Push image
+    displayName: Build Scan and Push image
     pool:
       vmImage: 'ubuntu-latest'
     steps:
