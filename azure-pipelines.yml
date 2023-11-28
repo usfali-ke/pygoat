@@ -61,7 +61,7 @@ stages:
         echo Running dependency-check-2.
         # docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
         pip3 install -r requirements.txt
-        docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker test --severity-threshold=high
+        docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker test --packages-folder=/project/requirements.txt --severity-threshold=high
       displayName: Dependency-check-2
       continueOnError: true
 
