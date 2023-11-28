@@ -47,6 +47,16 @@ stages:
         # docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker test --packages-folder=/project/requirements.txt --severity-threshold=high
       displayName: Dependency-check-2
       continueOnError: true
+    
+    - task: SnykSecurityScan@1
+      displayName: Dependency-check-3
+      inputs:
+        serviceConnectionEndpoint: 'snyk-auth'
+        testType: 'app'
+        severityThreshold: 'high'
+        failOnIssues: true
+        failOnThreshold: 'high'
+        monitorWhen: 'never'
 
     - script: |
         echo Running IaC.
