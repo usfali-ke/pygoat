@@ -64,13 +64,13 @@ stages:
     - script: |
           echo Running IaC.
           docker run --rm -w /src -v $(pwd):/src bridgecrew/checkov -d /src
-      displayName: 'IaC-checkov'
+      displayName: 'IaC_checkov'
       continueOnError: true
 
     - script: |
         echo Running SAST.
         docker run --user $(id -u):$(id -g) -v $(pwd):/src --rm hysnsec/bandit -r /src
-      displayName: 'SAST-Bandit'
+      displayName: 'SAST_Bandit'
       continueOnError: true
 
     - script: |
@@ -79,7 +79,7 @@ stages:
       displayName: 'SAST-SNYK'
       continueOnError: true
     - task: CmdLine@2
-      displayName: Container-scanning
+      displayName: Container_scanning
       inputs:
         script: |
          # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy image --severity MEDIUM,HIGH --ignore-unfixed $(imageName):$(tag)
@@ -88,11 +88,11 @@ stages:
     
     - script: echo Running dependency-check.
         docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
-      displayName: 'Dependency-check'
+      displayName: 'Dependency_check'
       continueOnError: true
     - task: Docker@2
       displayName: Push-image
-      condition: eq(variables['task.Container-scanning.status'], 'success')
+      condition: eq(variables['task.Container_scanning.status'], 'success')
       inputs:
         containerRegistry: 'Docker-alienke'
         repository: '$(imageName)'
