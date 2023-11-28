@@ -92,7 +92,7 @@ stages:
       continueOnError: true
     - task: Docker@2
       displayName: Push image
-      condition: eq(variables['task.Container scanning.status'], 'success')
+      condition: eq(variables['task.Dependency check.status'], 'success')
       inputs:
         containerRegistry: 'Docker-alienke'
         repository: '$(imageName)'
