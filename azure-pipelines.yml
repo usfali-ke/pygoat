@@ -84,6 +84,7 @@ stages:
     - script: |
         export DOCKLE_HOST="unix:///var/run/docker.sock"
       displayName: Setting up docker env
+
     - task: Docker@2
       displayName: Build an image
       inputs:
