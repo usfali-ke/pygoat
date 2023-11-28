@@ -51,10 +51,18 @@ stages:
       displayName: Setting up docker env
     
     - script: |
-        echo Running dependency-check.
+        echo Running dependency-check-1.
         # docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ -v $(pwd):/src aquasec/trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
       displayName: Dependency-check
+      continueOnError: true
+    
+    - script: |
+        echo Running dependency-check-2.
+        # docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
+        pip3 install -r requirements.txt
+        docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker test --severity-threshold=high
+      displayName: Dependency-check-2
       continueOnError: true
 
     - script: |
