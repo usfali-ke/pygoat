@@ -50,9 +50,10 @@ stages:
         export DOCKLE_HOST="unix:///var/run/docker.sock"
       displayName: Setting up docker env
     
-    - script: echo Running dependency-check.
+    - script: |
+        echo Running dependency-check.
         # docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ -v $(pwd):/src aquasec/trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
       displayName: Dependency-check
       continueOnError: true
 
