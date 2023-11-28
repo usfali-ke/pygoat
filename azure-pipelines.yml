@@ -46,18 +46,19 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    # - script: |
-    #     export DOCKLE_HOST="unix:///var/run/docker.sock"
-    #   displayName: Setting up docker env
+    - script: |
+        export DOCKLE_HOST="unix:///var/run/docker.sock"
+      displayName: Setting up docker env
     
     - script: echo Running dependency-check.
-        docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
+        # docker run --rm -v $(pwd):/src hysnsec/safety check -r /src/requirements.txt
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
       displayName: Dependency-check
       continueOnError: true
 
     - script: |
-          echo Running IaC.
-          docker run --rm -w /src -v $(pwd):/src bridgecrew/checkov -d /src
+        echo Running IaC.
+        docker run --rm -w /src -v $(pwd):/src bridgecrew/checkov -d /src
       displayName: Infra-as-Code
       continueOnError: true
 
