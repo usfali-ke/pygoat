@@ -40,11 +40,11 @@ stages:
         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ -v $(pwd):/src aquasec/trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
       displayName: Dependency-check
       continueOnError: true
-    - task: trivy@1
-      inputs:
-        path: .
-      displayName: Dependency-check-1
-      continueOnError: true
+    # - task: trivy@1
+    #   inputs:
+    #     path: .
+    #   displayName: Dependency-check-1
+    #   continueOnError: true
     
     # - script: |
     #     echo Running dependency-check-2.
@@ -137,19 +137,18 @@ stages:
         monitorWhen: 'never'
       continueOnError: true
     
-    - task: trivy@1
-      inputs:
-        image: $(imageName):$(tag)
-      displayName: Container-scanning-2
-      # continueOnError: true
-    
-    # - task: CmdLine@2
-    #   displayName: Container-scanning-2
+    # - task: trivy@1
     #   inputs:
-    #     script: |
-    #      # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy image --severity MEDIUM,HIGH --ignore-unfixed $(imageName):$(tag)
-    #      docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed $(imageName):$(tag)
+    #     image: $(imageName):$(tag)
+    #   displayName: Container-scanning-2
     #   # continueOnError: true
+    - task: CmdLine@2
+      displayName: Container-scanning-2
+      inputs:
+        script: |
+         # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy image --severity MEDIUM,HIGH --ignore-unfixed $(imageName):$(tag)
+         docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed $(imageName):$(tag)
+      # continueOnError: true
     - task: Docker@2
       displayName: Push image
       condition: succeeded()
