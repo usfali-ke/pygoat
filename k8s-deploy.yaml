@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: pygoat
+  name: pygoat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pygoat
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: pygoat
+    spec:
+      containers:
+      - image: $CI_REGISTRY_USER/pygoat:$CI_COMMIT_SHA
+        name: pygoat
+        resources: {}
