@@ -54,7 +54,7 @@ stages:
         snyk test --severity-threshold=high
         # docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker test --packages-folder=/project/requirements.txt --severity-threshold=high
       env:
-        MY_MAPPED_ENV_VAR: $(SNYK_TOKEN)
+        MY_MAPPED_ENV_VAR: $(snyk-auth)
       displayName: dependency-check-2
       continueOnError: true
     
