@@ -33,9 +33,9 @@ stages:
     - script: |
         env
       displayName: Printing env
-    - task: WhiteSource@21
-      inputs:
-        cwd: '$(System.DefaultWorkingDirectory)'
+    # - task: WhiteSource@21
+    #   inputs:
+    #     cwd: '$(System.DefaultWorkingDirectory)'
 
     - script: |
         echo Running dependency-check-1.
