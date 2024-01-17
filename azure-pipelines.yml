@@ -84,26 +84,26 @@ stages:
       displayName: sast-bandit
       continueOnError: true
 
-    - script: |
-        echo Running SAST.
-        # docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker code test --severity-threshold=high
-        npm install snyk -g
-        pip3 install -r requirements.txt
-        export SNYK_TOKEN=$(SNYK_TOKEN)
-        snyk code test --severity-threshold=high
-      displayName: sast-snyk
-      continueOnError: true
-    
-    # - task: SnykSecurityScan@1
-    #   inputs:
-    #     serviceConnectionEndpoint: 'snyk-auth'
-    #     testType: 'code'
-    #     codeSeverityThreshold: 'high'
-    #     failOnThreshold: 'high'
-    #     failOnIssues: true
-    #     monitorWhen: 'never'
+    # - script: |
+    #     echo Running SAST.
+    #     # docker run --rm -e SNYK_TOKEN=$(SNYK_TOKEN) -v "$(pwd):/project" snyk/snyk-cli:docker code test --severity-threshold=high
+    #     npm install snyk -g
+    #     pip3 install -r requirements.txt
+    #     export SNYK_TOKEN=$(SNYK_TOKEN)
+    #     snyk code test --severity-threshold=high
     #   displayName: sast-snyk
     #   continueOnError: true
+    
+    - task: SnykSecurityScan@1
+      inputs:
+        serviceConnectionEndpoint: 'snyk-auth'
+        testType: 'code'
+        codeSeverityThreshold: 'high'
+        failOnThreshold: 'high'
+        failOnIssues: true
+        monitorWhen: 'never'
+      displayName: sast-snyk
+      continueOnError: true
     
     - script: |
         env
