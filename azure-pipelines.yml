@@ -21,7 +21,7 @@ stages:
   displayName: Build, Scan and Push image
   jobs:
   - job: Tests
-    displayName: SAST Tests
+    displayName: Security Tests
     pool:
       vmImage: 'ubuntu-latest'
     steps:
@@ -112,7 +112,7 @@ stages:
   - job: Build
     dependsOn: Tests
     condition: succeeded()
-    displayName: Build, Scan and Push
+    displayName: Build, Scan, Push Img
     pool:
       vmImage: 'ubuntu-latest'
     steps:
